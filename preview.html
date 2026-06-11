@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Banking Management System – Preview</title>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #0d1117;
+      --surface:   #161b22;
+      --border:    #30363d;
+      --green:     #39d353;
+      --green-dim: #238636;
+      --cyan:      #58a6ff;
+      --yellow:    #e3b341;
+      --red:       #f85149;
+      --white:     #e6edf3;
+      --muted:     #8b949e;
+      --accent:    #1f6feb;
+    }
+
+    body {
+      background: var(--bg);
+      font-family: 'Inter', sans-serif;
+      color: var(--white);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem 1rem 4rem;
+    }
+
+    /* ── Page Header ─────────────────────────────────── */
+    .page-header {
+      text-align: center;
+      margin-bottom: 2.5rem;
+    }
+    .page-header h1 {
+      font-size: 1.8rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--cyan), var(--green));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .page-header p {
+      color: var(--muted);
+      font-size: 0.9rem;
+      margin-top: 0.4rem;
+    }
+    .badge {
+      display: inline-block;
+      background: var(--green-dim);
+      color: var(--green);
+      font-size: 0.75rem;
+      padding: 0.15rem 0.7rem;
+      border-radius: 20px;
+      margin-top: 0.6rem;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+
+    /* ── Layout ──────────────────────────────────────── */
+    .layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      max-width: 1100px;
+      width: 100%;
+    }
+    @media (max-width: 800px) {
+      .layout { grid-template-columns: 1fr; }
+    }
+    .col { display: flex; flex-direction: column; gap: 1.5rem; }
+
+    /* ── Card ────────────────────────────────────────── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.5);
+    }
+    .card-title-bar {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.7rem 1rem;
+      background: rgba(255,255,255,0.04);
+      border-bottom: 1px solid var(--border);
+    }
+    .dot { width: 12px; height: 12px; border-radius: 50%; }
+    .dot-r { background: #f85149; }
+    .dot-y { background: #e3b341; }
+    .dot-g { background: #39d353; }
+    .card-label {
+      margin-left: 0.5rem;
+      font-size: 0.78rem;
+      color: var(--muted);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* ── Terminal Content ─────────────────────────────── */
+    .terminal {
+      padding: 1.2rem 1.4rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+      line-height: 1.65;
+      white-space: pre;
+      overflow-x: auto;
+      color: var(--white);
+    }
+    .c-green  { color: var(--green); }
+    .c-cyan   { color: var(--cyan); }
+    .c-yellow { color: var(--yellow); }
+    .c-red    { color: var(--red); }
+    .c-muted  { color: var(--muted); }
+    .c-dim    { color: #444d56; }
+    .c-bold   { font-weight: 700; }
+
+    /* ── Feature Grid ─────────────────────────────────── */
+    .feature-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      max-width: 1100px;
+      width: 100%;
+      margin-top: 0.5rem;
+    }
+    @media (max-width: 600px) { .feature-grid { grid-template-columns: 1fr; } }
+
+    .feature-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.1rem 1.2rem;
+      display: flex;
+      align-items: flex-start;
+      gap: 0.9rem;
+      transition: border-color 0.2s;
+    }
+    .feature-card:hover { border-color: var(--accent); }
+    .feat-icon {
+      font-size: 1.6rem;
+      flex-shrink: 0;
+    }
+    .feat-title {
+      font-weight: 700;
+      font-size: 0.9rem;
+      color: var(--white);
+      margin-bottom: 0.2rem;
+    }
+    .feat-desc { font-size: 0.8rem; color: var(--muted); line-height: 1.5; }
+
+    /* ── Credentials Table ────────────────────────────── */
+    .cred-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+    }
+    .cred-table th {
+      background: rgba(88,166,255,0.1);
+      color: var(--cyan);
+      padding: 0.5rem 0.8rem;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+    .cred-table td {
+      padding: 0.5rem 0.8rem;
+      border-bottom: 1px solid rgba(48,54,61,0.5);
+      color: var(--white);
+    }
+    .cred-table tr:hover td { background: rgba(255,255,255,0.03); }
+    .pin-badge {
+      background: rgba(57,211,83,0.15);
+      color: var(--green);
+      padding: 0.1rem 0.5rem;
+      border-radius: 4px;
+    }
+    .admin-pin {
+      background: rgba(248,81,73,0.15);
+      color: var(--red);
+      padding: 0.1rem 0.5rem;
+      border-radius: 4px;
+    }
+
+    /* ── Section heading ──────────────────────────────── */
+    .section-heading {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 0.2rem;
+      max-width: 1100px;
+      width: 100%;
+    }
+
+    /* ── OOP Pill List ────────────────────────────────── */
+    .pill-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      max-width: 1100px;
+      width: 100%;
+    }
+    .pill {
+      background: rgba(31,111,235,0.15);
+      color: var(--cyan);
+      border: 1px solid rgba(31,111,235,0.3);
+      padding: 0.3rem 0.9rem;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <div class="page-header">
+    <h1>🏦 Banking Management System</h1>
+    <p>C++ Console Application — Interactive Preview</p>
+    <span class="badge">v1.0 · C++17</span>
+  </div>
+
+  <!-- Terminal Screens -->
+  <div class="layout">
+
+    <!-- LEFT: Welcome + Main Menu -->
+    <div class="col">
+      <div class="card">
+        <div class="card-title-bar">
+          <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
+          <span class="card-label">main menu</span>
+        </div>
+        <div class="terminal"><span class="c-dim">
+</span><span class="c-cyan">  ╔══════════════════════════════════════════════════════╗
+  ║                                                      ║
+  ║      ██████╗  █████╗ ███╗   ██╗██╗  ██╗             ║
+  ║      ██╔══██╗██╔══██╗████╗  ██║██║ ██╔╝             ║
+  ║      ██████╔╝███████║██╔██╗ ██║█████╔╝              ║
+  ║      ██╔══██╗██╔══██║██║╚██╗██║██╔═██╗             ║
+  ║      ██████╔╝██║  ██║██║ ╚████║██║  ██╗            ║
+  ║      ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═══╝╚═╝  ╚═╝           ║
+  ║                                                      ║
+  ║        BANKING MANAGEMENT SYSTEM  v1.0              ║
+  ║        Powered by C++ | Secure &amp; Reliable           ║</span>
+<span class="c-cyan">  ╚══════════════════════════════════════════════════════╝</span>
+
+<span class="c-green">  [INFO] No existing data found. Loading sample accounts...
+  Sample Accounts:</span>
+<span class="c-muted">    ACC-1001 | Alice Johnson  | PIN: 1234 | Balance: Rs.7800
+    ACC-1002 | Bob Smith      | PIN: 5678 | Balance: Rs.12200
+    ACC-1003 | Carol Williams | PIN: 9999 | Balance: Rs.800</span>
+
+<span class="c-yellow">  3 account(s) loaded.</span>
+
+  Press ENTER to continue...
+<span class="c-dim">────────────────────────────────────────────────────────</span>
+<span class="c-white">  ┌──────────────────────────────────────────┐
+  │             MAIN MENU                    │
+  ├──────────────────────────────────────────┤</span>
+<span class="c-cyan">  │  [1]  Create Account                     │
+  │  [2]  Customer Login                     │
+  │  [3]  Admin Panel                        │</span>
+<span class="c-red">  │  [0]  Exit                               │</span>
+<span class="c-white">  └──────────────────────────────────────────┘</span>
+  Choice: <span class="c-green c-bold">_</span>
+</div>
+      </div>
+
+      <!-- Create Account -->
+      <div class="card">
+        <div class="card-title-bar">
+          <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
+          <span class="card-label">create account</span>
+        </div>
+        <div class="terminal">
+<span class="c-white">  ┌────────────────────────────────────────┐
+  │         CREATE NEW ACCOUNT             │
+  └────────────────────────────────────────┘</span>
+
+  Full Name      : <span class="c-green">John Doe</span>
+  Set PIN (min 4 digits): <span class="c-green">****</span>
+  Confirm PIN    : <span class="c-green">****</span>
+  Initial Deposit (Rs.): <span class="c-green">5000</span>
+
+<span class="c-green">  ✔  Account created successfully!
+  ✔  Account Number: ACC-1004
+  ✔  Opening Balance: Rs. 5000.00</span>
+
+  Press ENTER to continue...
+</div>
+      </div>
+    </div>
+
+    <!-- RIGHT: Customer Menu + Admin Panel -->
+    <div class="col">
+      <!-- Customer Dashboard -->
+      <div class="card">
+        <div class="card-title-bar">
+          <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
+          <span class="card-label">customer login → dashboard</span>
+        </div>
+        <div class="terminal">
+<span class="c-white">  ┌────────────────────────────────────────┐
+  │            CUSTOMER LOGIN              │
+  └────────────────────────────────────────┘</span>
+
+  Account Number : <span class="c-green">ACC-1001</span>
+  PIN            : <span class="c-green">****</span>
+
+<span class="c-green">  ✔  Welcome, Alice Johnson!</span>
+
+<span class="c-cyan">  ╔════════════════════════════════════════════╗
+  ║  CUSTOMER MENU   [ACC-1001    ]      ║
+  ╠════════════════════════════════════════════╣
+  ║  [1]  Balance Inquiry                      ║
+  ║  [2]  Deposit Money                        ║
+  ║  [3]  Withdraw Money                       ║
+  ║  [4]  Transfer Money                       ║
+  ║  [5]  Mini Statement                       ║
+  ║  [6]  Full Account Details                 ║
+  ║  [0]  Logout                               ║
+  ╚════════════════════════════════════════════╝</span>
+  Choice: <span class="c-green">1</span>
+
+<span class="c-yellow">  Current Balance: Rs. 7800.00</span>
+
+  Press ENTER to continue...
+</div>
+      </div>
+
+      <!-- Mini Statement -->
+      <div class="card">
+        <div class="card-title-bar">
+          <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
+          <span class="card-label">mini statement · choice [5]</span>
+        </div>
+        <div class="terminal">
+<span class="c-cyan">  ─── Last 5 Transactions ─────────────────────</span>
+<span class="c-muted">  Date/Time            Type       Amount       Bal After</span>
+<span class="c-dim">  ─────────────────────────────────────────────────────</span>
+<span class="c-green">  2026-05-08 09:14     DEPOSIT    + Rs. 2000    Rs. 7800</span>
+<span class="c-red">  2026-05-08 08:50     WITHDRAW   - Rs.  500    Rs. 5800</span>
+<span class="c-yellow">  2026-05-07 17:30     TRANSFER   - Rs. 1000    Rs. 6300</span>
+<span class="c-green">  2026-05-07 16:10     DEPOSIT    + Rs. 3000    Rs. 7300</span>
+<span class="c-muted">  2026-05-07 10:00     OPENING    + Rs. 7800    Rs. 7800</span>
+<span class="c-dim">  ─────────────────────────────────────────────────────</span>
+
+  Press ENTER to continue...
+</div>
+      </div>
+
+      <!-- Admin Panel -->
+      <div class="card">
+        <div class="card-title-bar">
+          <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
+          <span class="card-label">admin panel</span>
+        </div>
+        <div class="terminal">
+<span class="c-white">  ┌────────────────────────────────────────┐
+  │            ADMIN LOGIN                 │
+  └────────────────────────────────────────┘</span>
+
+  Admin PIN: <span class="c-green">*********</span>
+<span class="c-green">  ✔  Admin authenticated.</span>
+
+<span class="c-red">  ╔════════════════════════════════════════════╗
+  ║           ADMIN PANEL                      ║
+  ╠════════════════════════════════════════════╣
+  ║  [1]  List All Accounts                    ║
+  ║  [2]  Search Account                       ║
+  ║  [3]  Delete Account                       ║
+  ║  [4]  Freeze / Unfreeze Account            ║
+  ║  [5]  View All Transactions                ║
+  ║  [0]  Logout                               ║
+  ╚════════════════════════════════════════════╝</span>
+  Choice: <span class="c-green">1</span>
+
+<span class="c-cyan">  Acc No     Holder            Balance      Status</span>
+<span class="c-dim">  ───────────────────────────────────────────────</span>
+  ACC-1001   Alice Johnson    Rs.  7800.00  <span class="c-green">ACTIVE</span>
+  ACC-1002   Bob Smith        Rs. 12200.50  <span class="c-green">ACTIVE</span>
+  ACC-1003   Carol Williams   Rs.   800.00  <span class="c-yellow">FROZEN</span>
+</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Features Section -->
+  <br/>
+  <div class="section-heading">✦ Features</div>
+  <br/>
+  <div class="feature-grid">
+    <div class="feature-card">
+      <span class="feat-icon">🔐</span>
+      <div>
+        <div class="feat-title">Secure Authentication</div>
+        <div class="feat-desc">PIN-based login with max 3 attempts. Separate customer and admin portals.</div>
+      </div>
+    </div>
+    <div class="feature-card">
+      <span class="feat-icon">💰</span>
+      <div>
+        <div class="feat-title">Full Transaction Suite</div>
+        <div class="feat-desc">Deposit, withdraw, and transfer money with overdraft protection and input validation.</div>
+      </div>
+    </div>
+    <div class="feature-card">
+      <span class="feat-icon">🧾</span>
+      <div>
+        <div class="feat-title">Transaction History</div>
+        <div class="feat-desc">Mini statement (last N) and full account details with timestamped records.</div>
+      </div>
+    </div>
+    <div class="feature-card">
+      <span class="feat-icon">🛡️</span>
+      <div>
+        <div class="feat-title">Admin Panel</div>
+        <div class="feat-desc">View all accounts, search, delete, and freeze/unfreeze accounts with admin credentials.</div>
+      </div>
+    </div>
+    <div class="feature-card">
+      <span class="feat-icon">💾</span>
+      <div>
+        <div class="feat-title">Persistent Storage</div>
+        <div class="feat-desc">All data saved to <code style="color:var(--cyan)">bank_data.txt</code> using <code style="color:var(--cyan)">fstream</code> — persists across sessions.</div>
+      </div>
+    </div>
+    <div class="feature-card">
+      <span class="feat-icon">📦</span>
+      <div>
+        <div class="feat-title">Modular Architecture</div>
+        <div class="feat-desc">6 separate files: account, bank, admin, filemanager, transaction, main — clean OOP design.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sample Credentials -->
+  <br/>
+  <div class="section-heading">🔑 Sample Credentials (First Run)</div>
+  <br/>
+  <div class="card" style="max-width:1100px;width:100%;">
+    <div class="card-title-bar">
+      <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
+      <span class="card-label">bank_data.txt — demo accounts</span>
+    </div>
+    <div style="padding: 1rem 1.2rem; overflow-x:auto;">
+      <table class="cred-table">
+        <thead>
+          <tr>
+            <th>Account No</th>
+            <th>Holder Name</th>
+            <th>PIN</th>
+            <th>Balance</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>ACC-1001</td>
+            <td>Alice Johnson</td>
+            <td><span class="pin-badge">1234</span></td>
+            <td>Rs. 7,800.00</td>
+            <td style="color:var(--green)">● ACTIVE</td>
+          </tr>
+          <tr>
+            <td>ACC-1002</td>
+            <td>Bob Smith</td>
+            <td><span class="pin-badge">5678</span></td>
+            <td>Rs. 12,200.50</td>
+            <td style="color:var(--green)">● ACTIVE</td>
+          </tr>
+          <tr>
+            <td>ACC-1003</td>
+            <td>Carol Williams</td>
+            <td><span class="pin-badge">9999</span></td>
+            <td>Rs. 800.00</td>
+            <td style="color:var(--yellow)">● FROZEN</td>
+          </tr>
+          <tr>
+            <td colspan="2" style="color:var(--muted)">Admin Portal</td>
+            <td><span class="admin-pin">admin123</span></td>
+            <td>—</td>
+            <td style="color:var(--red)">🔒 Admin</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- OOP Concepts -->
+  <br/>
+  <div class="section-heading">🎓 OOP Concepts Demonstrated</div>
+  <br/>
+  <div class="pill-list">
+    <span class="pill">Classes &amp; Objects</span>
+    <span class="pill">Encapsulation</span>
+    <span class="pill">Inheritance</span>
+    <span class="pill">Constructors</span>
+    <span class="pill">STL Vectors</span>
+    <span class="pill">File I/O (fstream)</span>
+    <span class="pill">Enums</span>
+    <span class="pill">Switch-Case Menus</span>
+    <span class="pill">Input Validation</span>
+    <span class="pill">Structs</span>
+    <span class="pill">Modular Design</span>
+    <span class="pill">Polymorphism</span>
+  </div>
+  <br/><br/>
+
+</body>
+</html>
