@@ -84,9 +84,9 @@ banking_system.exe
 
 | Account No | Name            | PIN  | Balance       |
 |------------|-----------------|------|---------------|
-| ACC-1001   | Alice Johnson   | 1234 | Rs. 7,800.00  |
-| ACC-1002   | Bob Smith       | 5678 | Rs. 12,200.50 |
-| ACC-1003   | Carol Williams  | 9999 | Rs. 800.00    |
+| ACC-1001   | Suryanshu Singh | 1234 | Rs. 7,800.00  |
+| ACC-1002   | Priyam Prakash  | 5678 | Rs. 12,200.50 |
+| ACC-1003   | Aryan Yadav     | 9999 | Rs. 800.00    |
 
 **Admin Login PIN:** `admin123`
 
